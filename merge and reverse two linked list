@@ -1,0 +1,193 @@
+/*
+***** OUTPUT EXAMPLE *****  
+Enter the elements of first linked list: 
+        
+Enter Element: 99
+
+ Enter 1 to continue or 0 to end: 1
+
+Enter Element: 1
+
+ Enter 1 to continue or 0 to end: 0
+
+Enter the elements of second linked list: 
+
+Enter Element: 50
+
+ Enter 1 to continue or 0 to end: 1
+
+Enter Element: 0
+
+ Enter 1 to continue or 0 to end: 0
+
+First Linked List: 99 -> 1 -> NULL
+
+
+Second Linked List: 50 -> 0 -> NULL
+
+ First Sorted Linked List: 1 -> 99 -> NULL
+
+ Second Sorted Linked List: 0 -> 50 -> NULL
+
+Merged Sorted Linked List: 0 -> 1 -> 50 -> 99 -> NULL
+
+ Reversed Linked List: 99 -> 50 -> 1 -> 0 -> NULL
+*/
+
+#include <stdio.h>
+#include <stdlib.h>
+
+//Function Definations
+struct node *newNode (int a);
+void addnode_FIFO(struct node *p, int choice);
+void traverse (int choice);
+
+//Structure for a linked list
+struct node{
+    int data;
+    struct node *next;
+}*head1=NULL,*head2=NULL;
+
+//Function to create a new node
+struct node *newNode(int a){
+    struct node *temp = (struct node *)malloc(sizeof(struct node));
+    temp -> data = a;
+    temp -> next = NULL;
+    return temp;
+}
+
+// Function to add a node to the list in FIFO manner
+void addnode_FIFO(struct node *p, int choice) {
+    if (choice == 1) {
+        if (head1 == NULL) {
+            head1 = p;
+        } else {
+            struct node *temp = head1;
+            while (temp->next != NULL) {
+                temp = temp->next;
+            }
+            temp->next = p;
+        }
+    } else {
+        if (head2 == NULL) {
+            head2 = p;
+        } else {
+            struct node *temp = head2;
+            while (temp->next != NULL) {
+                temp = temp->next;
+            }
+            temp->next = p;
+        }
+    }
+}
+
+//Function to traverse and print the list
+void traverse (int choice){
+    struct node *head = (choice == 1) ? head1 : head2;
+    struct node *temp = head;
+    while (temp != NULL){
+        printf("%d -> ", temp->data);
+        temp = temp->next;
+    }
+    printf("NULL\n");
+}
+
+//Function to sort the list - By using Bubble Sort
+void sortList(int choice){
+    struct node *head = (choice == 1) ? head1 : head2;
+
+    struct node *i, *j;
+    int tempData;
+ 
+    for( i = head; i != NULL; i = i->next ){
+        for( j = i->next; j != NULL; j = j->next ){
+            if( i -> data > j -> data ){
+                tempData = i -> data;
+                i -> data = j -> data;
+                j -> data = tempData;
+            }
+        }
+    }
+}
+
+// Function to merge the second list at the end of the first list
+void mergeList() {
+    if (head1 == NULL) {
+        head1 = head2;
+        return;
+    }
+    struct node *temp = head1;
+    while (temp->next != NULL) {
+        temp = temp->next;
+    }
+    temp->next = head2;
+    sortList(1); // Sort merged list
+}
+
+
+// Function to reverse the merged list
+void reverseList(){
+    struct node *prev = NULL;
+    struct node *current = head1;
+    struct node *next = NULL;
+    while(current != NULL){
+        next = current -> next; 
+        current -> next = prev;
+        prev = current;
+        current = next;
+    }
+    head1 = prev;
+}
+ 
+int main(){
+    int a, ch=1;
+    //Input First Linked List
+    printf("Enter the elements of first linked list: \n");
+    while(ch!=0){
+        printf("\nEnter Element: ");
+        scanf("%d", &a);
+ 
+        struct node *p = newNode(a);
+        addnode_FIFO(p,1);
+        printf("\n Enter 1 to continue or 0 to end: ");
+        scanf("%d", &ch);
+    }
+    //Input second linked list
+    ch=1;
+    printf("\nEnter the elements of second linked list: \n");
+    while(ch!=0){
+        printf("\nEnter Element: ");
+        scanf("%d", &a);
+ 
+        struct node *p = newNode(a);
+        addnode_FIFO(p,2);
+        printf("\n Enter 1 to continue or 0 to end: ");
+        scanf("%d", &ch);
+    }
+    //Print both linked list
+    printf("\nFirst Linked List: ");
+    traverse(1);
+    printf("\n");
+    printf("\nSecond Linked List: ");
+    traverse(2);
+
+    //Sort both lists
+    printf("\n First Sorted Linked List: ");
+    sortList(1);
+    traverse(1);
+    printf("\n Second Sorted Linked List: ");
+    sortList(2);
+    traverse(2);
+    
+    //merge the two lists
+    printf("\nMerged Sorted Linked List: ");
+    mergeList();
+    traverse(1);
+
+    //Reverse the merged list
+    printf("\n Reversed Linked List: ");
+    reverseList();
+    traverse(1);
+
+    return 0;
+}
