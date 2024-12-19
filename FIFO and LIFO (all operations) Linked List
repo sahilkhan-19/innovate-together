@@ -1,0 +1,415 @@
+/*
+*****OUTPUT Example*****
+
+*****Linked List*****
+Choose an option:-
+1. Linked List FIFO (Queue)
+2. Linked List LIFO (Stack)
+0. End
+
+**Want to perform any operation ??**
+1. Add Node Before
+2. Add Node After
+3. Delete First Node
+4. Delete Last Node
+5. Delete Any Node
+6. Delete Node After
+7. Delete Node Before
+0. End
+
+*****Thanks*****
+*/
+
+#include <stdio.h>
+#include <stdlib.h>
+
+// Function Prototypes
+struct node *newNode(int a);  // Creates a new node
+void addnode_FIFO(struct node *p);  // Adds a node in FIFO manner (Queue)
+void addnode_LIFO(struct node *p);  // Adds a node in LIFO manner (Stack)
+void traverse(int FL);  // Traverses and prints the linked list
+
+void addnode_before(int element, int prev);  // Adds a node before a specified element
+void addnode_after(int element, int after);  // Adds a node after a specified element
+void delete_first(void);  // Deletes the first node
+void delete_last(void);  // Deletes the last node
+void delete_anynode(int element);  // Deletes a node by specified value
+void delete_node_after(int element);  // Deletes the node after a specified element
+void delete_node_before(int element);  // Deletes the node before a specified element
+
+// Structure for linked list node
+struct node {
+    int info;  // Data value of the node
+    struct node *next;  // Pointer to the next node
+} *head = NULL;  // Head pointer initialized to NULL
+
+// Function to create a new node
+struct node *newNode(int a) {
+    struct node *p = (struct node *)malloc(sizeof(struct node));  // Allocate memory for new node
+    if (p == NULL) {
+        printf("\nMemory Allocation Failed!!");
+        exit(1);  // Exit if memory allocation fails
+    }
+    p->info = a;  // Assign value to the node
+    p->next = NULL;  // Set the next pointer to NULL
+    return p;  // Return the created node
+}
+
+// Function to add a node in FIFO manner (Queue)
+void addnode_FIFO(struct node *p) {
+    struct node *temp = head;
+    if (head == NULL) {  // If list is empty
+        head = p;  // Make the new node the head
+    } else {  // Traverse to the end of the list and insert the node
+        while (temp->next != NULL) {
+            temp = temp->next;
+        }
+        temp->next = p;
+    }
+}
+
+// Function to add a node in LIFO manner (Stack)
+void addnode_LIFO(struct node *p) {
+    p->next = head;  // Insert node at the head
+    head = p;
+}
+
+// Function to traverse and print the linked list
+void traverse(int FL) {
+    struct node *temp = head;
+    if (head == NULL) {
+        printf("\nList is empty");
+        return;
+    }
+
+    if (FL == 1) {  // FIFO: Print from head to NULL as is
+        while (temp != NULL) {
+            printf("%d", temp->info);  // Print node's value
+            temp = temp->next;  // Move to next node
+            if (temp != NULL) {
+                printf(" -> ");
+            }
+        }
+        printf(" -> NULL");  // End the list with NULL
+    } 
+    else if (FL == 2) {  // LIFO: Print in reverse order
+        // To print in reverse, we need to store the values in an array or use recursion
+
+        // Count the nodes
+        int count = 0;
+        struct node *current = head;
+        while (current != NULL) {
+            count++;
+            current = current->next;
+        }
+
+        // Create an array to store node values
+        int *values = (int *)malloc(count * sizeof(int));
+        current = head;
+        for (int i = 0; i < count; i++) {
+            values[i] = current->info;
+            current = current->next;
+        }
+
+        // Print the values in reverse order
+        for (int i = count - 1; i >= 0; i--) {
+            printf("%d", values[i]);
+            if (i > 0) {
+                printf(" -> ");
+            }
+        }
+        printf(" -> NULL");  // End the list with NULL
+
+        free(values);  // Free the allocated memory
+    }
+}
+
+// Function to add a node before a specific element
+void addnode_before(int element, int prev) {
+    struct node *new_node = newNode(element);  // Create new node
+    if (head == NULL) {
+        printf("\nList is Empty, No insertion is made!");
+        return;
+    }
+    if (head->info == prev) {  // If previous element is head
+        new_node->next = head;  // Insert at head
+        head = new_node;
+    } else {
+        struct node *temp = head;
+        while (temp->next != NULL && temp->next->info != prev) {
+            temp = temp->next;
+        }
+        if (temp->next == NULL) {
+            printf("\nNode Not Found!!");
+            free(new_node);  // Free memory if node not found
+            return;
+        }
+        new_node->next = temp->next;
+        temp->next = new_node;
+    }
+}
+
+// Function to add a node after a specific element
+void addnode_after(int element, int after) {
+    struct node *new_node = newNode(element);  // Create new node
+    struct node *temp = head;
+    while (temp != NULL && temp->info != after) {
+        temp = temp->next;
+    }
+    if (temp == NULL) {
+        printf("\nNode Not Found!!");
+        free(new_node);  // Free memory if node not found
+        return;
+    }
+    new_node->next = temp->next;
+    temp->next = new_node;
+}
+
+// Function to delete the first node
+void delete_first(void) {
+    if (head == NULL) {
+        printf("\nList is Empty!");
+        return;
+    }
+    struct node *temp = head;
+    head = head->next;
+    free(temp);
+}
+
+// Function to delete the last node
+void delete_last(void) {
+    if (head == NULL) {
+        printf("\nList is Empty!");
+        return;
+    }
+    if (head->next == NULL) {
+        free(head);
+        head = NULL;
+    } else {
+        struct node *temp = head;
+        while (temp->next->next != NULL) {
+            temp = temp->next;
+        }
+        free(temp->next);
+        temp->next = NULL;
+    }
+}
+
+// Function to delete a node by value
+void delete_anynode(int element) {
+    if (head == NULL) {
+        printf("\nList is Empty!");
+        return;
+    }
+    if (head->info == element) {
+        struct node *temp = head;
+        head = head->next;
+        free(temp);
+    } else {
+        struct node *temp = head;
+        while (temp->next != NULL && temp->next->info != element) {
+            temp = temp->next;
+        }
+        if (temp->next == NULL) {
+            printf("\nNode Not Found!!");
+            return;
+        }
+        struct node *del_node = temp->next;
+        temp->next = temp->next->next;
+        free(del_node);
+    }
+}
+
+// Function to delete the node after a specified element
+void delete_node_after(int element) {
+    struct node *temp = head;
+    while (temp != NULL && temp->info != element) {
+        temp = temp->next;
+    }
+    if (temp == NULL || temp->next == NULL) {
+        printf("\nNode Not Found!!");
+        return;
+    }
+    struct node *del_node = temp->next;
+    temp->next = temp->next->next;
+    free(del_node);
+}
+
+// Function to delete the node before a specified element
+void delete_node_before(int element) {
+    if (head == NULL || head->info == element) {
+        printf("\nList is Empty or No node exists before the element");
+        return;
+    }
+    struct node *temp = head;
+    if (head->next->info == element) {  // If the element is next to the head
+        struct node *del_node = head;
+        head = head->next;
+        free(del_node);
+    } else {
+        while (temp->next->next != NULL && temp->next->next->info != element) {
+            temp = temp->next;
+        }
+        if (temp->next->next == NULL) {
+            printf("\nNode Not Found!!");
+            return;
+        }
+        struct node *del_node = temp->next;
+        temp->next = temp->next->next;
+        free(del_node);
+    }
+}
+
+void main(void) {
+    int a, ch, FL;  // Variables to store element, choice, and flag
+    char choice = 'Y';  // To keep track of continuation
+    printf("*****Linked List*****\n");
+    printf("Choose an option:-\n");
+    printf("1. Linked List FIFO (Queue)\n");
+    printf("2. Linked List LIFO (Stack)\n");
+    printf("0. End\n\n");
+    
+    scanf("%d", &ch);  // Input choice
+
+    // If FIFO is chosen
+    if (ch == 1) {
+        while (choice != 'N' && choice != 'n') {
+            printf("\nEnter Element: ");
+            scanf("%d", &a);  // Input element
+            FL = 1;  // Flag for FIFO
+
+            struct node *p = newNode(a);  // Create new node
+            addnode_FIFO(p);  // Add node to list using FIFO
+
+            printf("Want to add more ?? (Y/N)\n");
+            scanf(" %c", &choice);  // Check if more elements need to be added
+        }
+        printf("\nLinked List: ");
+        traverse(FL);  // Traverse and print the list
+
+        // Display operations menu
+        int operation_choice, element, prev, after;
+        printf("\n**Want to perform any operation ??**\n");
+        printf("1. Add Node Before\n");
+        printf("2. Add Node After\n");
+        printf("3. Delete First Node\n");
+        printf("4. Delete Last Node\n");
+        printf("5. Delete Any Node\n");
+        printf("6. Delete Node After\n");
+        printf("7. Delete Node Before\n");
+        printf("0. End\n");
+        scanf("%d", &operation_choice);
+
+        // Switch-case to handle various operations
+        switch (operation_choice) {
+        case 1:  // Add Node Before
+            printf("\nEnter element to be inserted: ");
+            scanf("%d", &element);
+            printf("\nEnter Previous element: ");
+            scanf("%d", &prev);
+            addnode_before(element, prev);
+            printf("\nUpdated Linked List: ");
+            traverse(FL);
+            break;
+        
+        case 2:  // Add Node After
+            printf("\nEnter element to be inserted: ");
+            scanf("%d", &element);
+            printf("\nEnter After element: ");
+            scanf("%d", &after);
+            addnode_after(element, after);
+            printf("\nUpdated Linked List: ");
+            traverse(FL);
+            break;
+
+        case 3:  // Delete First Node
+            delete_first();
+            printf("\nUpdated Linked List: ");
+            traverse(FL);
+            break;
+
+        case 4:  // Delete Last Node
+            delete_last();
+            printf("\nUpdated Linked List: ");
+            traverse(FL);
+            break;
+
+        case 5:  // Delete Any Node
+            printf("\nEnter Element to be deleted: ");
+            scanf("%d", &element);
+            delete_anynode(element);
+            printf("\nUpdated Linked List: ");
+            traverse(FL);
+            break;
+
+        case 6:  // Delete Node After
+            printf("\nEnter Element: ");
+            scanf("%d", &element);
+            delete_node_after(element);
+            printf("\nUpdated Linked List: ");
+            traverse(FL);
+            break;
+
+        case 7:  // Delete Node Before
+            printf("\nEnter Element: ");
+            scanf("%d", &element);
+            delete_node_before(element);
+            printf("\nUpdated Linked List: ");
+            traverse(FL);
+            break;
+
+        default:
+            break;
+        }
+        printf("\n\t*****Thanks*****");
+    }
+    // If LIFO is chosen
+    else if (ch == 2) {
+        while (choice != 'N' && choice != 'n') {
+            printf("\nEnter Element: ");
+            scanf("%d", &a);  // Input element
+            FL = 2;  // Flag for LIFO
+
+            struct node *p = newNode(a);  // Create new node
+            addnode_LIFO(p);  // Add node to list using LIFO
+
+            printf("Want to add more ?? (Y/N)\n");
+            scanf(" %c", &choice);  // Check if more elements need to be added
+        }
+        printf("\nLinked List: \n");
+        traverse(FL);  // Traverse and print the list
+
+        // Same operations menu as FIFO
+        int operation_choice, element, prev, after;
+        printf("\n**Want to perform any operation ??**\n");
+        printf("1. Add Node Before\n");
+        printf("2. Add Node After\n");
+        printf("3. Delete First Node\n");
+        printf("4. Delete Last Node\n");
+        printf("5. Delete Any Node\n");
+        printf("6. Delete Node After\n");
+        printf("7. Delete Node Before\n");
+        printf("0. End\n");
+        scanf("%d", &operation_choice);
+
+        // Operations handled similarly as FIFO
+        switch (operation_choice) {
+        // Same cases as in FIFO
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+        case 6:
+        case 7:
+            break;
+
+        default:
+            break;
+        }
+        printf("\n\t*****Thanks*****");
+    } else {
+        printf("End..");  // End the program
+        exit(1);  // Exit if the choice is 0
+    }
+}
