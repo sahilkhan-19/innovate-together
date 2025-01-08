@@ -1,0 +1,54 @@
+'''
+Output Sample
+Enter the data (preferably separated by space): 12 21 12 12 2 54 2 35 6 48 97
+Choose any option from the following
+        0.End
+        1.Mean
+        2.Median
+        3.Mode
+Enter choice : 1
+27.363636363636363
+Enter choice : 2
+12
+Enter choice : 3
+[12]
+Enter choice : 0'''
+def mean(l):
+    avg=sum(l)/len(l)
+    return avg
+def median(l):
+    l.sort()
+    if len(l)%2==0:
+        med=(l[len(l)//2-1]+l[len(l)//2])/2
+    else:
+        med=l[len(l)//2]
+    return med
+def mode(l):
+    frequency={}
+    for value in data:
+        if value in frequency:
+            frequency[value]+=1
+        else:
+            frequency[value]=1
+    max_freq=max(frequency.values())
+    mode=[k for k,v in frequency.items() if v==max_freq]
+    if len(mode)==len(l):
+        return None
+    return mode
+data= list(map(int, input("Enter the data (preferably separated by space): ").split()))
+choice="y"
+print('''Choose any option from the following
+        0.End
+        1.Mean
+        2.Median
+        3.Mode''')
+while True:
+    choice=int(input("Enter choice : "))
+    if choice==1:
+         print(mean(data))
+    elif choice==2:
+         print(median(data))
+    elif choice==3:
+         print(mode(data))
+    else:
+        break
