@@ -1,0 +1,98 @@
+/*
+Output sample
+Enter the number of elements in the tree: 10
+Enter the elements of the tree: 
+32
+12
+36
+13
+76
+1
+23
+43
+65
+98
+
+In-order Traversal: 43 13 65 12 98 76 32 1 36 2 
+Pre-order Traversal: 32 12 13 43 65 76 98 36 1 2 
+Post-order Traversal: 43 65 13 98 76 12 1 2 36 32 
+*/
+#include <stdio.h>
+#include <stdlib.h>
+
+// Define the structure for a binary tree node
+typedef struct Node {
+    int data;
+    struct Node *left, *right;
+} Node;
+
+// Function to create a new node
+Node* createNode(int data) {
+    Node* newNode = (Node*)malloc(sizeof(Node));
+    newNode->data = data;
+    newNode->left = newNode->right = NULL;
+    return newNode;
+}
+
+// Function to insert nodes level-wise to make a Complete Binary Tree
+Node* insertLevelOrder(int arr[], int i, int n) {
+    Node* root = NULL;
+    if (i < n) {
+        root = createNode(arr[i]);
+        root->left = insertLevelOrder(arr, 2 * i + 1, n);
+        root->right = insertLevelOrder(arr, 2 * i + 2, n);
+    }
+    return root;
+}
+
+// In-order traversal
+void inorderTraversal(Node* root) {
+    if (root == NULL)
+        return;
+    inorderTraversal(root->left);
+    printf("%d ", root->data);
+    inorderTraversal(root->right);
+}
+
+// Pre-order traversal
+void preorderTraversal(Node* root) {
+    if (root == NULL)
+        return;
+    printf("%d ", root->data);
+    preorderTraversal(root->left);
+    preorderTraversal(root->right);
+}
+
+// Post-order traversal
+void postorderTraversal(Node* root) {
+    if (root == NULL)
+        return;
+    postorderTraversal(root->left);
+    postorderTraversal(root->right);
+    printf("%d ", root->data);
+}
+
+int main() {
+    int n, i;
+    printf("Enter the number of elements in the tree: ");
+    scanf("%d", &n);
+
+    int arr[n];
+    printf("Enter the elements of the tree: \n");
+    for (i = 0; i < n; i++) {
+        scanf("%d", &arr[i]);
+    }
+
+    Node* root = insertLevelOrder(arr, 0, n);
+
+    printf("\nIn-order Traversal: ");
+    inorderTraversal(root);
+
+    printf("\nPre-order Traversal: ");
+    preorderTraversal(root);
+
+    printf("\nPost-order Traversal: ");
+    postorderTraversal(root);
+
+    return 0;
+}
