@@ -6,12 +6,16 @@ Choose any option from the following
         1.Mean
         2.Median
         3.Mode
+        4.Geometric mean
 Enter choice : 1
 27.363636363636363
 Enter choice : 2
 12
 Enter choice : 3
 [12]
+Enter choice : 4
+Enter choice : 4
+14.835888135632391
 Enter choice : 0'''
 def mean(l):
     avg=sum(l)/len(l)
@@ -35,13 +39,20 @@ def mode(l):
     if len(mode)==len(l):
         return None
     return mode
+def geo_mean(l):
+    mul=1
+    for i in range(0,len(l)):
+        mul*=l[i]
+    g_mean=(float)(math.pow(mul,(1/len(l))))
+    return g_mean
 data= list(map(int, input("Enter the data (preferably separated by space): ").split()))
 choice="y"
 print('''Choose any option from the following
         0.End
         1.Mean
         2.Median
-        3.Mode''')
+        3.Mode
+        4.Geometric mean''')
 while True:
     choice=int(input("Enter choice : "))
     if choice==1:
@@ -50,5 +61,7 @@ while True:
          print(median(data))
     elif choice==3:
          print(mode(data))
+    elif choice==4:
+        print(geo_mean(data))
     else:
         break
