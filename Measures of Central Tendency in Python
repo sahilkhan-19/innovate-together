@@ -76,3 +76,83 @@ while True:
         print(har_mean(data))
     else:
         break
+
+'Another Method---->'
+
+# Getting user input
+user_input = input("Enter a series of numbers separated by spaces: ")
+data = list(map(int, user_input.split()))
+choice = 1
+
+# Calculating mean, median, mode, geometric mean, and harmonic mean
+while choice != 0:
+    print('''\n1. Mean\n2. Median\n3. Mode\n4. Geometric Mean\n5. Harmonic Mean\n0. End''')
+    choice = int(input("\nEnter Choice: "))
+
+    if choice == 1:
+        mean = calculate_mean(data)
+        print(f"Mean: {mean}")
+    
+    elif choice == 2:
+        median = calculate_median(data)
+        print(f"Median: {median}")
+    
+    elif choice == 3:
+        mode = calculate_mode(data)
+        print(f"Mode: {mode}")
+    
+    elif choice == 4:
+        geometric_mean = calculate_geometric_mean(data)
+        print(f"Geometric Mean: {geometric_mean}")
+    
+    elif choice == 5:
+        harmonic_mean = calculate_harmonic_mean(data)
+        print(f"Harmonic Mean: {harmonic_mean}")
+    
+    elif choice == 0:
+        print("Exiting...")
+
+    else:
+        print("Invalid choice. Please try again.")
+
+
+# Function to calculate mean
+def calculate_mean(data):
+    return sum(data) / len(data)
+
+# Function to calculate median
+def calculate_median(data):
+    data.sort()
+    n = len(data)
+    if n % 2 == 0:
+        median = (data[n//2 - 1] + data[n//2]) / 2
+    else:
+        median = data[n//2]
+    return median
+
+# Function to calculate mode
+def calculate_mode(data):
+    frequency = {}
+    for num in data:
+        frequency[num] = frequency.get(num, 0) + 1
+    
+    max_frequency = max(frequency.values())
+    mode = [key for key, value in frequency.items() if value == max_frequency]
+    
+    # If all numbers appear only once, there is no mode
+    if len(mode) == len(data):
+        return None
+    return mode
+
+# Function to calculate geometric mean
+def calculate_geometric_mean(data):
+    product = 1
+    for num in data:
+        product *= num
+    return product ** (1/len(data))
+
+# Function to calculate harmonic mean
+def calculate_harmonic_mean(data):
+    reciprocal_sum = sum(1 / num for num in data)
+    return len(data) / reciprocal_sum
+
