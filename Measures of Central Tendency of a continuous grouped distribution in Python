@@ -1,0 +1,138 @@
+'''
+Output Sample
+Enter Class Intervals (comma-separated): 0-10, 10-20, 20-30, 30-40, 40-50
+Enter Frequencies (comma-separated): 42, 35, 47, 54, 31
+
+Which measure of central tendency would you like to calculate?
+1. Mean
+2. Median
+3. Mode
+4. All
+5.End
+Enter your choice : 1
+
+Mean: 24.86
+
+Which measure of central tendency would you like to calculate?
+1. Mean
+2. Median
+3. Mode
+4. All
+5.End
+Enter your choice : 2
+
+Median: 25.85
+
+Which measure of central tendency would you like to calculate?
+1. Mean
+2. Median
+3. Mode
+4. All
+5.End
+Enter your choice : 3
+
+Mode: 32.33
+
+Which measure of central tendency would you like to calculate?
+1. Mean
+2. Median
+3. Mode
+4. All
+5.End
+Enter your choice : 4
+
+Mean: 24.86
+Median: 25.85
+Mode: 32.33
+
+Which measure of central tendency would you like to calculate?
+1. Mean
+2. Median
+3. Mode
+4. All
+5.End
+Enter your choice : 5
+'''
+import pandas as pd
+
+def calculate_mean(df):
+    #Class mark
+    df['Midpoint']=df['Class Interval'].apply(lambda x:(int(x.split('-')[0])+int(x.split('-')[1]))/2)
+    #Product of frequency and class mark
+    df['FX']=df['Frequency']*df['Midpoint']
+    #Mean calculation
+    mean=df['FX'].sum()/df['Frequency'].sum()
+    return mean
+
+def calculate_median(df):
+    #Cumulative Frequency
+    df['Cumulative Frequency']=df['Frequency'].cumsum()
+    N=df['Frequency'].sum()
+    #Median class
+    median_class_index=df['Cumulative Frequency'].searchsorted(N / 2)
+    median_class=df.iloc[median_class_index]
+    #Lower bound of the median class
+    L=int(median_class['Class Interval'].split('-')[0])
+    #Cumulative Frequency of the class preceding the median class
+    F=0 if median_class_index==0 else df.iloc[median_class_index - 1]['Cumulative Frequency']
+    #Frequency of the median class
+    f_median=median_class['Frequency']
+    #Class width
+    c=int(median_class['Class Interval'].split('-')[1])-int(median_class['Class Interval'].split('-')[0])
+    #Median calculation
+    median=L+((N/2-F)/f_median)*c
+    return median
+
+def calculate_mode(df):
+    #Modal class
+    modal_class_index=df['Frequency'].idxmax()
+    modal_class=df.iloc[modal_class_index]
+    #Lower bound of the modal class
+    L=int(modal_class['Class Interval'].split('-')[0])
+    #Frequency of modal class
+    f_mode=modal_class['Frequency']
+    #Frequency preceding the frequency the modal class
+    f_prev=0 if modal_class_index==0 else df.iloc[modal_class_index-1]['Frequency']
+    #Frequency succeeding the frequency of modal class
+    f_next=0 if modal_class_index==len(df)-1 else df.iloc[modal_class_index+1]['Frequency']
+    #Class width
+    c=int(modal_class['Class Interval'].split('-')[1])-int(modal_class['Class Interval'].split('-')[0])
+    #Mode calculation
+    mode=L+((f_mode-f_prev)/((f_mode-f_prev)+(f_mode-f_next)))*c
+    return mode
+
+def calculate_statistics():
+    class_intervals=input("Enter Class Intervals (comma-separated): ").split(",")
+    frequencies=list(map(int, input("Enter Frequencies (comma-separated): ").split(",")))
+    if len(class_intervals)!=len(frequencies):
+        print("Error: Number of class intervals and frequencies must match.")
+        return
+    data={"Class Interval": class_intervals, "Frequency": frequencies}
+    df=pd.DataFrame(data)
+    while True:
+        print("\nWhich measure of central tendency would you like to calculate?")
+        print("1. Mean")
+        print("2. Median")
+        print("3. Mode")
+        print("4. All")
+        print("5.End")
+        choice=input("Enter your choice : ")
+        if choice=='1':  
+           mean=calculate_mean(df)
+           print(f"\nMean: {mean:.2f}")
+        elif choice=='2':
+           median=calculate_median(df)
+           print(f"\nMedian: {median:.2f}")
+        elif choice=='3':
+           mode=calculate_mode(df)
+           print(f"\nMode: {mode:.2f}")
+        elif choice=='4':
+           mean=calculate_mean(df)
+           median=calculate_median(df)
+           mode=calculate_mode(df)
+           print(f"\nMean: {mean:.2f}")
+           print(f"Median: {median:.2f}")
+           print(f"Mode: {mode:.2f}")
+        else:
+           break
+calculate_statistics()
