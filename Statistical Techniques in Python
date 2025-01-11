@@ -6,43 +6,73 @@
 # 1. Mean
 # 2. Median
 # 3. Mode
-# 4. Geometric Mean
-# 5. Harmonic Mean
-# 6. Moment about mean
-# 7. Moment about any arbitrary number
-# 8. Moment about origin
-# 9. All
-# Enter your choice : 9
-# Enter the order of the moment about the mean: 1
-# Enter the arbitrary number: 5
-# Enter the order of the moment: 1
-# Enter the order of the moment about the origin: 1
+# 4. Variance
+# 5. Standard deviation
+# 6. Geometric Mean
+# 7. Harmonic Mean
+# 8. Moment about mean
+# 9. Moment about any arbitrary number
+# 10. Moment about origin
+# 11. Karl Pearson's coefficient of skewness
+# 12. All
+# Enter your choice : 11
 
-# Arithmetic Mean: 24.86
-# Median: 25.85
-# Mode: 32.33
-# Geometric Mean: 19.77
-# Harmonic Mean: 14.08
-# Required Moment about Mean: 0.00
-# Required Moment about 5.0: 19.86
-# Required Moment about Origin: 24.86
+# Karl Pearson's coeeficient of skewness: -0.55
+# The distribution is negatively skewed
 
 # Which measure would you like to calculate?
 # 1. Mean
 # 2. Median
 # 3. Mode
-# 4. Geometric Mean
-# 5. Harmonic Mean
-# 6. Moment about mean
-# 7. Moment about any arbitrary number
-# 8. Moment about origin
-# 9. All
-# Enter your choice : 10
+# 4. Variance
+# 5. Standard deviation
+# 6. Geometric Mean
+# 7. Harmonic Mean
+# 8. Moment about mean
+# 9. Moment about any arbitrary number
+# 10. Moment about origin
+# 11. Karl Pearson's coefficient of skewness
+# 12. All
+# Enter your choice : 12
+# Enter the order of the moment about the mean: 3
+# Enter the arbitrary number: 5
+# Enter the order of the moment: 2
+# Enter the order of the moment about the origin: 4
+
+# Arithmetic Mean: 24.86
+# Median: 25.85
+# Mode: 32.33
+# Variance: 182.28
+# Standard Deviation: 13.50
+# Geometric Mean: 19.77
+# Harmonic Mean: 14.08
+# Required Moment about Mean: -251.65
+# Required Moment about 5.0: 576.56
+# Required Moment about Origin: 1092395.33
+
+# Karl Pearson's coeeficient of skewness: -0.55
+# The distribution is negatively skewed
+
+# Which measure would you like to calculate?
+# 1. Mean
+# 2. Median
+# 3. Mode
+# 4. Variance
+# 5. Standard deviation
+# 6. Geometric Mean
+# 7. Harmonic Mean
+# 8. Moment about mean
+# 9. Moment about any arbitrary number
+# 10. Moment about origin
+# 11. Karl Pearson's coefficient of skewness
+# 12. All
+# Enter your choice : 13
 
 # Invalid choice. Please try again.
 
 # Do you want to re-enter the data? (yes/no): no
 # Thank you! Exiting the program.
+
 
 import pandas as pd
 import numpy as np
@@ -93,13 +123,28 @@ def calculate_mode(df):
     mode=L+((f_mode-f_prev)/((f_mode-f_prev)+(f_mode-f_next)))*c
     return mode
 
+def calculate_variance(df):
+    mean = calculate_mean(df)
+    #(x- mean of x)**2
+    df['Squared Deviation']=(df['Midpoint']-mean)**2
+    df['Weighted Squared Deviation']=df['Frequency']*df['Squared Deviation']
+    #Variance calculation
+    variance = df['Weighted Squared Deviation'].sum()/df['Frequency'].sum()
+    return variance
+
+def calculate_standard_deviation(df):
+    variance=calculate_variance(df)
+    #Standard deviation calculation
+    std_dev=np.sqrt(variance)
+    return std_dev
+
 def calculate_geometric_mean(df):
     #Class mark
     df['Midpoint']=df['Class Interval'].apply(lambda x: (int(x.split('-')[0])+int(x.split('-')[1])) / 2)
     #Summation of frequency
     total_freq=df['Frequency'].sum()
     #Geometric mean calculation
-    gm=np.exp((df['Frequency'] * np.log(df['Midpoint'])).sum() / total_freq)
+    gm=np.exp((df['Frequency']*np.log(df['Midpoint'])).sum()/total_freq)
     return gm
 
 def calculate_harmonic_mean(df):
@@ -114,25 +159,36 @@ def calculate_harmonic_mean(df):
 def calculate_moment_about_mean(df, order):
     mean = calculate_mean(df)
     #(x-mean of x)
-    df['Deviation'] = df['Midpoint'] - mean
-    df['Moment'] = df['Frequency'] * (df['Deviation'] ** order)
-    #Moment about mean
-    moment_about_mean = df['Moment'].sum() / df['Frequency'].sum()
+    df['Deviation']=df['Midpoint']-mean
+    #Product of frequency and deviation raised to the power of order/r
+    df['Moment']=df['Frequency']*(df['Deviation']**order)
+    #Moment about mean calculation
+    moment_about_mean=df['Moment'].sum()/df['Frequency'].sum()
     return moment_about_mean
 
 def calculate_moment_about_arbitrary(df, number, order):
-    #(x-number)
-    df['Deviation'] = df['Midpoint'] - number
-    df['Moment'] = df['Frequency'] * (df['Deviation'] ** order)
-    #Moment about an arbitrary number
-    moment_about_number = df['Moment'].sum() / df['Frequency'].sum()
+    #(x-A)
+    df['Deviation']=df['Midpoint']-number
+    #Product of frequency and deviation raised to the power of order/r
+    df['Moment']=df['Frequency']*(df['Deviation']**order)
+    #Moment about an arbitrary number calculation
+    moment_about_number=df['Moment'].sum()/df['Frequency'].sum()
     return moment_about_number
 
 def calculate_moment_about_origin(df, order):
-    df['Moment'] = df['Frequency'] * (df['Midpoint'] ** order)
-    #Moment about origin
-    moment_about_origin = df['Moment'].sum() / df['Frequency'].sum()
+    ##Product of frequency and class mark raised to the power of order/r
+    df['Moment']=df['Frequency']*(df['Midpoint']**order)
+    #Moment about origin calculation
+    moment_about_origin=df['Moment'].sum()/df['Frequency'].sum()
     return moment_about_origin
+
+def Karl_coeff_skewness(df):
+    mean=calculate_mean(df)
+    S_D=calculate_standard_deviation(df)
+    mode=calculate_mode(df)
+    #Karl Pearson's coefficient of Skewness
+    K_C_skewness=(float)(mean-mode)/S_D
+    return K_C_skewness
 
 def calculate_statistics():
     while True:
@@ -148,12 +204,15 @@ def calculate_statistics():
             print("1. Mean")
             print("2. Median")
             print("3. Mode")
-            print("4. Geometric Mean")
-            print("5. Harmonic Mean")
-            print("6. Moment about mean")
-            print("7. Moment about any arbitrary number")
-            print("8. Moment about origin")
-            print("9. All")
+            print("4. Variance")
+            print("5. Standard deviation")
+            print("6. Geometric Mean")
+            print("7. Harmonic Mean")
+            print("8. Moment about mean")
+            print("9. Moment about any arbitrary number")
+            print("10. Moment about origin")
+            print("11. Karl Pearson's coefficient of skewness")
+            print("12. All")
             choice=input("Enter your choice : ")
             if choice=='1':
                 mean=calculate_mean(df)
@@ -165,45 +224,73 @@ def calculate_statistics():
                 mode=calculate_mode(df)
                 print(f"\nMode: {mode:.2f}")
             elif choice=='4':
+                variance = calculate_variance(df)
+                print(f"\nVariance: {variance:.2f}")
+            elif choice=='5':
+                std_dev = calculate_standard_deviation(df)
+                print(f"\nStandard Deviation: {std_dev:.2f}")
+            elif choice=='6':
                 gm=calculate_geometric_mean(df)
                 print(f"\nGeometric Mean: {gm:.2f}")
-            elif choice=='5':
+            elif choice=='7':
                 hm=calculate_harmonic_mean(df)
                 print(f"\nHarmonic Mean: {hm:.2f}")
-            elif choice=='6':
+            elif choice=='8':
                 order = int(input("Enter the order of the moment about the mean: "))
                 Moment_mean=calculate_moment_about_mean(df, order)
                 print(f"\nRequired Moment about Mean: {Moment_mean:.2f}")
-            elif choice=='7':
+            elif choice=='9':
                 number=float(input("Enter the arbitrary number: "))
                 order=int(input("Enter the order of the moment: "))
                 Moment_arbitrary=calculate_moment_about_arbitrary(df, number, order)
                 print(f"\nRequired Moment about {number}: {Moment_arbitrary:.2f}")
-            elif choice=='8':
+            elif choice=='10':
                 order=int(input("Enter the order of the moment about the origin: "))
                 Moment_origin=calculate_moment_about_origin(df, order)
                 print(f"\nRequired Moment about Origin: {Moment_origin:.2f}")
-            elif choice=='9':
+            elif choice=='11':
+                K_C_skewness=Karl_coeff_skewness(df)
+                print(f"\nKarl Pearson's coeeficient of skewness: {K_C_skewness:.2f}")
+                #To check for the symmetry of distribution
+                if K_C_skewness==0:
+                    print("The distribution is symmetrical")
+                elif K_C_skewness>0:
+                    print("The distribution is positively skewed")
+                else:
+                    print("The distribution is negatively skewed")
+            elif choice=='12':
                 mean=calculate_mean(df)
                 median=calculate_median(df)
                 mode=calculate_mode(df)
+                variance=calculate_variance(df)
+                std_dev=calculate_standard_deviation(df)
                 gm=calculate_geometric_mean(df)
                 hm=calculate_harmonic_mean(df)
-                order = int(input("Enter the order of the moment about the mean: "))
+                order=int(input("Enter the order of the moment about the mean: "))
                 Moment_mean=calculate_moment_about_mean(df,order)
-                number = float(input("Enter the arbitrary number: "))
-                order = int(input("Enter the order of the moment: "))
+                number=float(input("Enter the arbitrary number: "))
+                order=int(input("Enter the order of the moment: "))
                 Moment_arbitrary=calculate_moment_about_arbitrary(df,number,order)
-                order = int(input("Enter the order of the moment about the origin: "))
+                order=int(input("Enter the order of the moment about the origin: "))
                 Moment_origin=calculate_moment_about_origin(df, order)
+                K_C_skewness=Karl_coeff_skewness(df)
                 print(f"\nArithmetic Mean: {mean:.2f}")
                 print(f"Median: {median:.2f}")
                 print(f"Mode: {mode:.2f}")
+                print(f"Variance: {variance:.2f}")
+                print(f"Standard Deviation: {std_dev:.2f}")
                 print(f"Geometric Mean: {gm:.2f}")
                 print(f"Harmonic Mean: {hm:.2f}")
                 print(f"Required Moment about Mean: {Moment_mean:.2f}")
                 print(f"Required Moment about {number}: {Moment_arbitrary:.2f}")
                 print(f"Required Moment about Origin: {Moment_origin:.2f}")
+                print(f"\nKarl Pearson's coeeficient of skewness: {K_C_skewness:.2f}")
+                if K_C_skewness==0:
+                    print("The distribution is symmetrical")
+                elif K_C_skewness>0:
+                    print("The distribution is positively skewed")
+                else:
+                    print("The distribution is negatively skewed")
             else:
                 print("\nInvalid choice. Please try again.")
                 break
