@@ -1,24 +1,24 @@
-'''
-Output Sample
-Enter the data (preferably separated by space): 12 21 12 12 2 54 2 35 6 48 97
-Choose any option from the following
-        0.End
-        1.Mean
-        2.Median
-        3.Mode
-        4.Geometric mean
-        5.Harmonic mean
-Enter choice : 1
-27.363636363636363
-Enter choice : 2
-12
-Enter choice : 3
-[12]
-Enter choice : 4
-14.835888135632391
-Enter choice : 5
-7.131195910037445
-Enter choice : 0'''
+# Output Sample
+# Enter the data (preferably separated by space): 12 21 12 12 2 54 2 35 6 48 97
+# Choose any option from the following
+#         0.End
+#         1.Mean
+#         2.Median
+#         3.Mode
+#         4.Geometric mean
+#         5.Harmonic mean
+# Enter choice : 1
+# 27.363636363636363
+# Enter choice : 2
+# 12
+# Enter choice : 3
+# [12]
+# Enter choice : 4
+# 14.835888135632391
+# Enter choice : 5
+# 7.131195910037445
+# Enter choice : 0
+
 def mean(l):
     avg=sum(l)/len(l)
     return avg

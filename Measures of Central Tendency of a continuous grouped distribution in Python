@@ -1,58 +1,57 @@
-'''
-Output Sample
-Enter Class Intervals (comma-separated): 0-10, 10-20, 20-30, 30-40, 40-50
-Enter Frequencies (comma-separated): 42, 35, 47, 54, 31
+# Output Sample
+# Enter Class Intervals (comma-separated): 0-10, 10-20, 20-30, 30-40, 40-50
+# Enter Frequencies (comma-separated): 42, 35, 47, 54, 31
 
-Which measure of central tendency would you like to calculate?
-1. Mean
-2. Median
-3. Mode
-4. All
-5.End
-Enter your choice : 1
+# Which measure of central tendency would you like to calculate?
+# 1. Mean
+# 2. Median
+# 3. Mode
+# 4. All
+# 5.End
+# Enter your choice : 1
 
-Mean: 24.86
+# Mean: 24.86
 
-Which measure of central tendency would you like to calculate?
-1. Mean
-2. Median
-3. Mode
-4. All
-5.End
-Enter your choice : 2
+# Which measure of central tendency would you like to calculate?
+# 1. Mean
+# 2. Median
+# 3. Mode
+# 4. All
+# 5.End
+# Enter your choice : 2
 
-Median: 25.85
+# Median: 25.85
 
-Which measure of central tendency would you like to calculate?
-1. Mean
-2. Median
-3. Mode
-4. All
-5.End
-Enter your choice : 3
+# Which measure of central tendency would you like to calculate?
+# 1. Mean
+# 2. Median
+# 3. Mode
+# 4. All
+# 5.End
+# Enter your choice : 3
 
-Mode: 32.33
+# Mode: 32.33
 
-Which measure of central tendency would you like to calculate?
-1. Mean
-2. Median
-3. Mode
-4. All
-5.End
-Enter your choice : 4
+# Which measure of central tendency would you like to calculate?
+# 1. Mean
+# 2. Median
+# 3. Mode
+# 4. All
+# 5.End
+# Enter your choice : 4
 
-Mean: 24.86
-Median: 25.85
-Mode: 32.33
+# Mean: 24.86
+# Median: 25.85
+# Mode: 32.33
 
-Which measure of central tendency would you like to calculate?
-1. Mean
-2. Median
-3. Mode
-4. All
-5.End
-Enter your choice : 5
-'''
+# Which measure of central tendency would you like to calculate?
+# 1. Mean
+# 2. Median
+# 3. Mode
+# 4. All
+# 5.End
+# Enter your choice : 5
+
 import pandas as pd
 
 def calculate_mean(df):
