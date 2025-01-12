@@ -1,72 +1,87 @@
 # Output Sample
+
 # Enter Class Intervals (comma-separated): 0-10, 10-20, 20-30, 30-40, 40-50
 # Enter Frequencies (comma-separated): 42, 35, 47, 54, 31
 
 # Which measure would you like to calculate?
 # 1. Mean
 # 2. Median
-# 3. Mode
-# 4. Variance
-# 5. Standard deviation
-# 6. Geometric Mean
-# 7. Harmonic Mean
-# 8. Moment about mean
-# 9. Moment about any arbitrary number
-# 10. Moment about origin
-# 11. Karl Pearson's coefficient of skewness
-# 12. All
-# Enter your choice : 11
-
-# Karl Pearson's coeeficient of skewness: -0.55
-# The distribution is negatively skewed
-
-# Which measure would you like to calculate?
-# 1. Mean
-# 2. Median
-# 3. Mode
-# 4. Variance
-# 5. Standard deviation
-# 6. Geometric Mean
-# 7. Harmonic Mean
-# 8. Moment about mean
-# 9. Moment about any arbitrary number
-# 10. Moment about origin
-# 11. Karl Pearson's coefficient of skewness
-# 12. All
-# Enter your choice : 12
+# 3. Quartiles
+# 4. Deciles
+# 5. Percentiles
+# 6. Mode
+# 7. Variance
+# 8. Standard deviation
+# 9. Geometric Mean
+# 10. Harmonic Mean
+# 11. Moment about mean
+# 12. Moment about any arbitrary number
+# 13. Moment about origin
+# 14. Karl Pearson's coefficient of skewness
+# 15. Moment coefficient of skewness
+# 16. Measure of Kurtosis
+# 17. All
+# Enter your choice : 17
 # Enter the order of the moment about the mean: 3
 # Enter the arbitrary number: 5
 # Enter the order of the moment: 2
 # Enter the order of the moment about the origin: 4
 
 # Arithmetic Mean: 24.86
+
 # Median: 25.85
+
+# Q3: 36.06
+
+# D9: 43.26
+
+# P90: 43.26
+
 # Mode: 32.33
+
 # Variance: 182.28
+
 # Standard Deviation: 13.50
+
 # Geometric Mean: 19.77
+
 # Harmonic Mean: 14.08
+
 # Required Moment about Mean: -251.65
+
 # Required Moment about 5.0: 576.56
+
 # Required Moment about Origin: 1092395.33
 
 # Karl Pearson's coeeficient of skewness: -0.55
+
 # The distribution is negatively skewed
+
+# Moment Coefficient of Skewness: -0.10
+
+# Measure of Kurtosis: 1.81
+
+# The distribution is Platykurtic
 
 # Which measure would you like to calculate?
 # 1. Mean
 # 2. Median
-# 3. Mode
-# 4. Variance
-# 5. Standard deviation
-# 6. Geometric Mean
-# 7. Harmonic Mean
-# 8. Moment about mean
-# 9. Moment about any arbitrary number
-# 10. Moment about origin
-# 11. Karl Pearson's coefficient of skewness
-# 12. All
-# Enter your choice : 13
+# 3. Quartiles
+# 4. Deciles
+# 5. Percentiles
+# 6. Mode
+# 7. Variance
+# 8. Standard deviation
+# 9. Geometric Mean
+# 10. Harmonic Mean
+# 11. Moment about mean
+# 12. Moment about any arbitrary number
+# 13. Moment about origin
+# 14. Karl Pearson's coefficient of skewness
+# 15. Moment coefficient of skewness
+# 16. Measure of Kurtosis
+# 17. All
+# Enter your choice : 18
 
 # Invalid choice. Please try again.
 
@@ -105,6 +120,66 @@ def calculate_median(df):
     median=L+((N/2-F)/f_median)*c
     return median
 
+def calculate_quartile(df,q):
+    #Cumulative Frequency
+    df['Cumulative Frequency']=df['Frequency'].cumsum()
+    N=df['Frequency'].sum()
+    #Quartile class
+    position=q*N/4
+    quartile_class_index=df['Cumulative Frequency'].searchsorted(position)
+    quartile_class=df.iloc[quartile_class_index]
+    #Lower bound of the quartile class
+    L=int(quartile_class['Class Interval'].split('-')[0])
+    #Cumulative Frequency of the class preceding the quartile class
+    F=0 if quartile_class_index==0 else df.iloc[quartile_class_index-1]['Cumulative Frequency']
+    #Frequency of the quartile class
+    f_quartile=quartile_class['Frequency']
+    #Class width
+    c=int(quartile_class['Class Interval'].split('-')[1])-int(quartile_class['Class Interval'].split('-')[0])
+    #Quartile calculation
+    quartile=L+((position-F)/f_quartile)*c
+    return quartile
+
+def calculate_decile(df,d):
+    #Cumulative Frequency
+    df['Cumulative Frequency']=df['Frequency'].cumsum()
+    N=df['Frequency'].sum()
+    #Decile class
+    position=d*N/10
+    decile_class_index=df['Cumulative Frequency'].searchsorted(position)
+    decile_class=df.iloc[decile_class_index]
+    #Lower bound of the decile class
+    L=int(decile_class['Class Interval'].split('-')[0])
+    #Cumulative Frequency of the class preceding the decile class
+    F=0 if decile_class_index==0 else df.iloc[decile_class_index-1]['Cumulative Frequency']
+    #Frequency of the decile class
+    f_decile=decile_class['Frequency']
+    #Class width 
+    c=int(decile_class['Class Interval'].split('-')[1])-int(decile_class['Class Interval'].split('-')[0])
+    #Decile calculation
+    decile=L+((position-F)/f_decile)*c
+    return decile
+
+def calculate_percentile(df,p):
+    #Cumulative Frequency
+    df['Cumulative Frequency']=df['Frequency'].cumsum()
+    N=df['Frequency'].sum()
+    #Percentile class
+    position=p*N/100
+    percentile_class_index=df['Cumulative Frequency'].searchsorted(position)
+    percentile_class=df.iloc[percentile_class_index]
+    #Lower bound of the percentile class
+    L=int(percentile_class['Class Interval'].split('-')[0])
+    #Cumulative Frequency of the class preceding the percentile class
+    F=0 if percentile_class_index == 0 else df.iloc[percentile_class_index-1]['Cumulative Frequency']
+    #Frequency of the percentile class
+    f_percentile=percentile_class['Frequency']
+    #Class width
+    c=int(percentile_class['Class Interval'].split('-')[1])-int(percentile_class['Class Interval'].split('-')[0])
+    #Percentile calculation
+    percentile=L +((position-F)/f_percentile)*c
+    return percentile
+
 def calculate_mode(df):
     #Modal class
     modal_class_index=df['Frequency'].idxmax()
@@ -129,7 +204,7 @@ def calculate_variance(df):
     df['Squared Deviation']=(df['Midpoint']-mean)**2
     df['Weighted Squared Deviation']=df['Frequency']*df['Squared Deviation']
     #Variance calculation
-    variance = df['Weighted Squared Deviation'].sum()/df['Frequency'].sum()
+    variance=df['Weighted Squared Deviation'].sum()/df['Frequency'].sum()
     return variance
 
 def calculate_standard_deviation(df):
@@ -156,8 +231,8 @@ def calculate_harmonic_mean(df):
     hm=total_freq/(df['Frequency']/df['Midpoint']).sum()
     return hm
 
-def calculate_moment_about_mean(df, order):
-    mean = calculate_mean(df)
+def calculate_moment_about_mean(df,order):
+    mean=calculate_mean(df)
     #(x-mean of x)
     df['Deviation']=df['Midpoint']-mean
     #Product of frequency and deviation raised to the power of order/r
@@ -166,7 +241,7 @@ def calculate_moment_about_mean(df, order):
     moment_about_mean=df['Moment'].sum()/df['Frequency'].sum()
     return moment_about_mean
 
-def calculate_moment_about_arbitrary(df, number, order):
+def calculate_moment_about_arbitrary(df,number,order):
     #(x-A)
     df['Deviation']=df['Midpoint']-number
     #Product of frequency and deviation raised to the power of order/r
@@ -176,7 +251,7 @@ def calculate_moment_about_arbitrary(df, number, order):
     return moment_about_number
 
 def calculate_moment_about_origin(df, order):
-    ##Product of frequency and class mark raised to the power of order/r
+    #Product of frequency and class mark raised to the power of order/r
     df['Moment']=df['Frequency']*(df['Midpoint']**order)
     #Moment about origin calculation
     moment_about_origin=df['Moment'].sum()/df['Frequency'].sum()
@@ -189,6 +264,26 @@ def Karl_coeff_skewness(df):
     #Karl Pearson's coefficient of Skewness
     K_C_skewness=(float)(mean-mode)/S_D
     return K_C_skewness
+
+def Moment_coeff_skewness(df):
+    mean=calculate_mean(df)
+    #Third moment calculation
+    df['Third Moment']=df['Frequency']*(df['Midpoint']-mean)**3
+    third_moment=df['Third Moment'].sum()/df['Frequency'].sum()
+    variance=calculate_variance(df)
+    #Moment of coefficient of skewness calculation
+    skewness=(float)(third_moment/np.sqrt((variance**3)))
+    return skewness
+
+def calculate_kurtosis(df):
+    mean=calculate_mean(df)
+    #Fourth moment calculation
+    df['Fourth Moment']=df['Frequency']*(df['Midpoint']-mean)**4
+    fourth_moment=df['Fourth Moment'].sum()/df['Frequency'].sum()
+    variance=calculate_variance(df)
+    #Measure of Kurtosis calculation
+    kurtosis=(float)(fourth_moment/(variance**2))
+    return kurtosis
 
 def calculate_statistics():
     while True:
@@ -203,16 +298,21 @@ def calculate_statistics():
             print("\nWhich measure would you like to calculate?")
             print("1. Mean")
             print("2. Median")
-            print("3. Mode")
-            print("4. Variance")
-            print("5. Standard deviation")
-            print("6. Geometric Mean")
-            print("7. Harmonic Mean")
-            print("8. Moment about mean")
-            print("9. Moment about any arbitrary number")
-            print("10. Moment about origin")
-            print("11. Karl Pearson's coefficient of skewness")
-            print("12. All")
+            print("3. Quartiles")
+            print("4. Deciles")
+            print("5. Percentiles")
+            print("6. Mode")
+            print("7. Variance")
+            print("8. Standard deviation")
+            print("9. Geometric Mean")
+            print("10. Harmonic Mean")
+            print("11. Moment about mean")
+            print("12. Moment about any arbitrary number")
+            print("13. Moment about origin")
+            print("14. Karl Pearson's coefficient of skewness")
+            print("15. Moment coefficient of skewness")
+            print("16. Measure of Kurtosis")
+            print("17. All")
             choice=input("Enter your choice : ")
             if choice=='1':
                 mean=calculate_mean(df)
@@ -221,36 +321,48 @@ def calculate_statistics():
                 median=calculate_median(df)
                 print(f"\nMedian: {median:.2f}")
             elif choice=='3':
+                for q in range(1,5):
+                    quartile=calculate_quartile(df,q)
+                    print(f"\nQ{q}: {quartile:.2f}")
+            elif choice=='4':
+                for d in range(1,11):
+                    decile = calculate_decile(df,d)
+                    print(f"\nD{d}: {decile:.2f}")
+            elif choice=='5':
+                for p in [10, 25, 50, 75, 90]:
+                    percentile = calculate_percentile(df, p)
+                    print(f"\nP{p}: {percentile:.2f}")
+            elif choice=='6':
                 mode=calculate_mode(df)
                 print(f"\nMode: {mode:.2f}")
-            elif choice=='4':
+            elif choice=='7':
                 variance = calculate_variance(df)
                 print(f"\nVariance: {variance:.2f}")
-            elif choice=='5':
+            elif choice=='8':
                 std_dev = calculate_standard_deviation(df)
                 print(f"\nStandard Deviation: {std_dev:.2f}")
-            elif choice=='6':
+            elif choice=='9':
                 gm=calculate_geometric_mean(df)
                 print(f"\nGeometric Mean: {gm:.2f}")
-            elif choice=='7':
+            elif choice=='10':
                 hm=calculate_harmonic_mean(df)
                 print(f"\nHarmonic Mean: {hm:.2f}")
-            elif choice=='8':
+            elif choice=='11':
                 order = int(input("Enter the order of the moment about the mean: "))
-                Moment_mean=calculate_moment_about_mean(df, order)
+                Moment_mean=calculate_moment_about_mean(df,order)
                 print(f"\nRequired Moment about Mean: {Moment_mean:.2f}")
-            elif choice=='9':
+            elif choice=='12':
                 number=float(input("Enter the arbitrary number: "))
                 order=int(input("Enter the order of the moment: "))
-                Moment_arbitrary=calculate_moment_about_arbitrary(df, number, order)
+                Moment_arbitrary=calculate_moment_about_arbitrary(df,number,order)
                 print(f"\nRequired Moment about {number}: {Moment_arbitrary:.2f}")
-            elif choice=='10':
+            elif choice=='13':
                 order=int(input("Enter the order of the moment about the origin: "))
-                Moment_origin=calculate_moment_about_origin(df, order)
+                Moment_origin=calculate_moment_about_origin(df,order)
                 print(f"\nRequired Moment about Origin: {Moment_origin:.2f}")
-            elif choice=='11':
+            elif choice=='14':
                 K_C_skewness=Karl_coeff_skewness(df)
-                print(f"\nKarl Pearson's coeeficient of skewness: {K_C_skewness:.2f}")
+                print(f"\nKarl Pearson's coeficient of skewness: {K_C_skewness:.2f}")
                 #To check for the symmetry of distribution
                 if K_C_skewness==0:
                     print("The distribution is symmetrical")
@@ -258,9 +370,28 @@ def calculate_statistics():
                     print("The distribution is positively skewed")
                 else:
                     print("The distribution is negatively skewed")
-            elif choice=='12':
+            elif choice=='15':
+                skewness=Moment_coeff_skewness(df)
+                print(f"\nMoment Coefficient of Skewness: {skewness:.2f}")
+            elif choice=='16':
+                kurtosis=calculate_kurtosis(df)
+                #Checking the shape of the curve of the distribution
+                print(f"\nMeasure of Kurtosis: {kurtosis:.2f}")
+                if kurtosis>3:
+                    print("The distribution is Leptokurtic")
+                elif kurtosis==3:
+                    print("The distribution is Mesokurtic")
+                else:
+                    print("The distribution is Platykurtic")
+            elif choice=='17':
                 mean=calculate_mean(df)
                 median=calculate_median(df)
+                for q in range(1,4):
+                    quartile=calculate_quartile(df,q)
+                for d in range(1,10):
+                    decile=calculate_decile(df,d)
+                for p in [10, 25, 50, 75, 90]:
+                    percentile=calculate_percentile(df,p)
                 mode=calculate_mode(df)
                 variance=calculate_variance(df)
                 std_dev=calculate_standard_deviation(df)
@@ -274,23 +405,36 @@ def calculate_statistics():
                 order=int(input("Enter the order of the moment about the origin: "))
                 Moment_origin=calculate_moment_about_origin(df, order)
                 K_C_skewness=Karl_coeff_skewness(df)
+                skewness=Moment_coeff_skewness(df)
+                kurtosis=calculate_kurtosis(df)
                 print(f"\nArithmetic Mean: {mean:.2f}")
-                print(f"Median: {median:.2f}")
-                print(f"Mode: {mode:.2f}")
-                print(f"Variance: {variance:.2f}")
-                print(f"Standard Deviation: {std_dev:.2f}")
-                print(f"Geometric Mean: {gm:.2f}")
-                print(f"Harmonic Mean: {hm:.2f}")
-                print(f"Required Moment about Mean: {Moment_mean:.2f}")
-                print(f"Required Moment about {number}: {Moment_arbitrary:.2f}")
-                print(f"Required Moment about Origin: {Moment_origin:.2f}")
-                print(f"\nKarl Pearson's coeeficient of skewness: {K_C_skewness:.2f}")
+                print(f"\nMedian: {median:.2f}")
+                print(f"\nQ{q}: {quartile:.2f}")
+                print(f"\nD{d}: {decile:.2f}")
+                print(f"\nP{p}: {percentile:.2f}")
+                print(f"\nMode: {mode:.2f}")
+                print(f"\nVariance: {variance:.2f}")
+                print(f"\nStandard Deviation: {std_dev:.2f}")
+                print(f"\nGeometric Mean: {gm:.2f}")
+                print(f"\nHarmonic Mean: {hm:.2f}")
+                print(f"\nRequired Moment about Mean: {Moment_mean:.2f}")
+                print(f"\nRequired Moment about {number}: {Moment_arbitrary:.2f}")
+                print(f"\nRequired Moment about Origin: {Moment_origin:.2f}")
+                print(f"\nKarl Pearson's coeeficient of skewness: {K_C_skewness:.2f}\n")
                 if K_C_skewness==0:
                     print("The distribution is symmetrical")
                 elif K_C_skewness>0:
                     print("The distribution is positively skewed")
                 else:
                     print("The distribution is negatively skewed")
+                print(f"\nMoment Coefficient of Skewness: {skewness:.2f}")
+                print(f"\nMeasure of Kurtosis: {kurtosis:.2f}\n")
+                if kurtosis>3:
+                    print("The distribution is Leptokurtic")
+                elif kurtosis==3:
+                    print("The distribution is Mesokurtic")
+                else:
+                    print("The distribution is Platykurtic")
             else:
                 print("\nInvalid choice. Please try again.")
                 break
