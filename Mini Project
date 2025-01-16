@@ -108,7 +108,7 @@ def calculate_moment_about_arbitrary(df,number,order):
     #Moment about an arbitrary number calculation
     moment_about_number=df['Moment'].sum()/df['Frequency'].sum()
     return moment_about_number
-def calculate_moment_about_origin(df, order):
+def calculate_moment_about_origin(df,order):
     #Product of frequency and class mark raised to the power of order/r
     df['Moment']=df['Frequency']*(df['Midpoint']**order)
     #Moment about origin calculation
@@ -151,8 +151,8 @@ def calculate_correlation_coeff(df1,df2):
     mean_x=calculate_mean(df1)
     mean_y=calculate_mean(df2)
     covariance=sum((df1['Midpoint']-mean_x)*(df2['Midpoint']-mean_y))
-    std_x=np.sqrt(sum((df1['Midpoint']-mean_x)*2))
-    std_y=np.sqrt(sum((df2['Midpoint']-mean_y)**2))
+    std_x=np.sqrt(abs(sum((df1['Midpoint']-mean_x)*2)))
+    std_y=np.sqrt(abs(sum((df2['Midpoint']-mean_y)**2)))
     correlation_coeff=covariance/(std_x*std_y)
     return correlation_coeff
 def calculate_statistics():
@@ -216,7 +216,7 @@ def calculate_statistics():
                 else:
                     mode=calculate_mode(df_y)
                     print(f"\nMode: {mode:.2f}")
-            elif choice=='3':
+            elif choice=='4':
                 if choose=='Distribution 1':
                     for p in [10, 25, 50, 75, 90]:
                         percentile=calculate_percentile(df_x,p)
