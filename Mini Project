@@ -150,8 +150,8 @@ def calculate_gamma2(df):
 def calculate_correlation_coeff(df1,df2):
     mean_x=calculate_mean(df1)
     mean_y=calculate_mean(df2)
-    covariance=sum((df1['Midpoint']-mean_x)*(df2['Midpoint']-mean_y))
-    std_x=np.sqrt(abs(sum((df1['Midpoint']-mean_x)*2)))
+    covariance=sum((df1['Midpoint']-mean_x)*(df2['Midpoint']-mean_y))/len(df1)
+    std_x=np.sqrt(abs(sum((df1['Midpoint']-mean_x)**2)))
     std_y=np.sqrt(abs(sum((df2['Midpoint']-mean_y)**2)))
     correlation_coeff=covariance/(std_x*std_y)
     return correlation_coeff
