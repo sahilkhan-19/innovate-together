@@ -1,7 +1,12 @@
-# Output Sample
-
+# Output sample
+# Enter the grouped data for the first variety (X)
+# Enter Class Intervals (comma-separated): 0-20, 20-40, 40-60, 60-80, 80-100
+# Enter Frequencies (comma-separated): 13, 21, 09, 30, 25
+# Enter the grouped data for the second variety (Y)
 # Enter Class Intervals (comma-separated): 0-10, 10-20, 20-30, 30-40, 40-50
 # Enter Frequencies (comma-separated): 42, 35, 47, 54, 31
+# Which group distribution's measure would you like to calculate
+# Distribution 1 or Distribution 2 : Distribution 2
 
 # Which measure would you like to calculate?
 # 1. Mean
@@ -20,24 +25,60 @@
 # 14. Karl Pearson's coefficient of skewness
 # 15. Moment coefficient of skewness
 # 16. Measure of Kurtosis
-# 17. All
-# Enter your choice : 17
-# Enter the order of the moment about the mean: 3
+# 17. Gamma 1
+# 18. Gamma 2
+# 19. Correlation coefficient
+# 20. Rank correlation coefficient
+# 21. All
+# Enter your choice : 21
+# Enter the order of the moment about the mean: 2
 # Enter the arbitrary number: 5
-# Enter the order of the moment: 2
-# Enter the order of the moment about the origin: 4
+# Enter the order of the moment: 3
+# Enter the order of the moment about the origin: 1
 
 # Arithmetic Mean: 24.86
 
 # Median: 25.85
 
+# Mode: 32.33
+
+# Q1: 12.93
+
+# Q2: 25.85
+
 # Q3: 36.06
+
+# Q4: 50.00
+
+# D1: 4.98
+
+# D2: 9.95
+
+# D3: 15.91
+
+# D4: 21.40
+
+# D5: 25.85
+
+# D6: 30.26
+
+# D7: 34.13
+
+# D8: 38.00
 
 # D9: 43.26
 
-# P90: 43.26
+# D10: 50.00
 
-# Mode: 32.33
+# P10: 4.98
+
+# P25: 12.93
+
+# P50: 25.85
+
+# P75: 36.06
+
+# P90: 43.26
 
 # Variance: 182.28
 
@@ -47,11 +88,11 @@
 
 # Harmonic Mean: 14.08
 
-# Required Moment about Mean: -251.65
+# Required Moment about Mean: 182.28
 
-# Required Moment about 5.0: 576.56
+# Required Moment about 5.0: 18435.41
 
-# Required Moment about Origin: 1092395.33
+# Required Moment about Origin: 24.86
 
 # Karl Pearson's coeeficient of skewness: -0.55
 
@@ -63,34 +104,19 @@
 
 # The distribution is Platykurtic
 
-# Which measure would you like to calculate?
-# 1. Mean
-# 2. Median
-# 3. Quartiles
-# 4. Deciles
-# 5. Percentiles
-# 6. Mode
-# 7. Variance
-# 8. Standard deviation
-# 9. Geometric Mean
-# 10. Harmonic Mean
-# 11. Moment about mean
-# 12. Moment about any arbitrary number
-# 13. Moment about origin
-# 14. Karl Pearson's coefficient of skewness
-# 15. Moment coefficient of skewness
-# 16. Measure of Kurtosis
-# 17. All
-# Enter your choice : 18
+# Gamma 1: 0.32
 
-# Invalid choice. Please try again.
+# Gamma 2: -1.19
+
+# The coefficient of correlation is: 0.19
+
+# The rank coefficient of correlation is: 1.00
 
 # Do you want to re-enter the data? (yes/no): no
 # Thank you! Exiting the program.
-
-
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 
 def calculate_mean(df):
     #Class mark
@@ -177,7 +203,7 @@ def calculate_percentile(df,p):
     #Class width
     c=int(percentile_class['Class Interval'].split('-')[1])-int(percentile_class['Class Interval'].split('-')[0])
     #Percentile calculation
-    percentile=L +((position-F)/f_percentile)*c
+    percentile=L+((position-F)/f_percentile)*c
     return percentile
 
 def calculate_mode(df):
@@ -285,15 +311,85 @@ def calculate_kurtosis(df):
     kurtosis=(float)(fourth_moment/(variance**2))
     return kurtosis
 
+def calculate_gamma1(df):
+    B1=Moment_coeff_skewness(df)
+    Y1=np.sqrt(abs(B1))
+    return Y1
+
+def calculate_gamma2(df):
+    B2=calculate_kurtosis(df)
+    Y2=B2-3
+    return Y2
+
+def calculate_correlation_coeff(df1,df2):
+    mean_x=calculate_mean(df1)
+    mean_y=calculate_mean(df2)
+    covariance=sum((df1['Midpoint']-mean_x)*(df2['Midpoint']-mean_y))/len(df1)
+    std_x=np.sqrt(abs(sum((df1['Midpoint']-mean_x)**2)))
+    std_y=np.sqrt(abs(sum((df2['Midpoint']-mean_y)**2)))
+    correlation_coeff=covariance/(std_x*std_y)
+    return correlation_coeff
+
+def calculate_rank_correlation_coeff(df1,df2):
+    if len(df1)!=len(df2):
+        return "Error: The two datasets must have the same length."
+    df1['Rank']=df1['Midpoint'].rank()
+    df2['Rank']=df2['Midpoint'].rank()
+    df1['Rank Difference']=df1['Rank']-df2['Rank']
+    df1['Rank Difference Squared'] = df1['Rank Difference']**2
+    n=len(df1)
+    d_squared_sum=df1['Rank Difference Squared'].sum()
+    rank_correlation_coeff=1-(6*d_squared_sum)/(n*(n**2-1))
+    return rank_correlation_coeff
+
+def plot_graph(df_x, df_y):
+    # Generate the class midpoints for continuous graph
+    x_midpoints=[(int(interval.split('-')[0])+int(interval.split('-')[1]))/2 for interval in df_x['Class Interval']]
+    y_midpoints=[(int(interval.split('-')[0]) + int(interval.split('-')[1]))/2 for interval in df_y['Class Interval']]
+    # Plotting the frequency distributions as continuous lines
+    plt.plot(x_midpoints, df_x['Frequency'],label="Distribution X",color='blue', marker='o')
+    plt.plot(y_midpoints, df_y['Frequency'],label="Distribution Y",color='green', marker='o')
+    # Calculate and plot Mean, Median, and Mode for Distribution 1 (X)
+    mean_x=calculate_mean(df_x)
+    median_x=calculate_median(df_x)
+    mode_x=calculate_mode(df_x)
+    plt.axvline(mean_x,color='blue',linestyle='--',label=f"Mean X={mean_x:.2f}")
+    plt.axvline(median_x,color='blue',linestyle=':',label=f"Median X={median_x:.2f}")
+    plt.axvline(mode_x,color='blue',linestyle='-',label=f"Mode X={mode_x:.2f}")
+    # Calculate and plot Mean, Median, and Mode for Distribution 2 (Y)
+    mean_y=calculate_mean(df_y)
+    median_y=calculate_median(df_y)
+    mode_y=calculate_mode(df_y)
+    plt.axvline(mean_y,color='green',linestyle='--',label=f"Mean Y={mean_y:.2f}")
+    plt.axvline(median_y,color='green',linestyle=':',label=f"Median Y={median_y:.2f}")
+    plt.axvline(mode_y,color='green',linestyle='-',label=f"Mode Y={mode_y:.2f}")
+    # Set labels and title
+    plt.xlabel('Class Midpoints')
+    plt.ylabel('Frequency')
+    plt.title('Frequency Distribution for X and Y')
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
 def calculate_statistics():
     while True:
-        class_intervals=input("Enter Class Intervals (comma-separated): ").split(",")
-        frequencies=list(map(int, input("Enter Frequencies (comma-separated): ").split(",")))
-        if len(class_intervals)!=len(frequencies):
-            print("Error: Number of class intervals and frequencies must match.")
-            continue  
-        data={"Class Interval": class_intervals, "Frequency": frequencies}
-        df=pd.DataFrame(data)
+        print("Enter the grouped data for the first variety (X)")
+        class_intervals_x=input("Enter Class Intervals (comma-separated): ").split(",")
+        frequencies_x=list(map(int,input("Enter Frequencies (comma-separated): ").split(",")))
+        print("Enter the grouped data for the second variety (Y)")
+        class_intervals_y=input("Enter Class Intervals (comma-separated): ").split(",")
+        frequencies_y=list(map(int,input("Enter Frequencies (comma-separated): ").split(",")))
+        data_x={"Class Interval": class_intervals_x,"Frequency": frequencies_x}
+        df_x=pd.DataFrame(data_x)
+        data_y={"Class Interval": class_intervals_y,"Frequency": frequencies_y}
+        df_y=pd.DataFrame(data_y)
+        if len(df_x)!=len(df_y):
+            return "Error: The two datasets must have the same length."
+        if len(class_intervals_x)!=len(frequencies_x) or len(class_intervals_y)!=len(frequencies_y):
+            print("Error: The number of class intervals and frequencies must match for both datasets.")
+            continue
+        print("Which group distribution's measure would you like to calculate")
+        choose=input("Distribution 1 or Distribution 2 : ")
         while True:
             print("\nWhich measure would you like to calculate?")
             print("1. Mean")
@@ -312,132 +408,332 @@ def calculate_statistics():
             print("14. Karl Pearson's coefficient of skewness")
             print("15. Moment coefficient of skewness")
             print("16. Measure of Kurtosis")
-            print("17. All")
+            print("17. Gamma 1")
+            print("18. Gamma 2")
+            print("19. Correlation coefficient")
+            print("20. Rank correlation coefficient")
+            print("21. All")
             choice=input("Enter your choice : ")
             if choice=='1':
-                mean=calculate_mean(df)
-                print(f"\nArithmetic Mean: {mean:.2f}")
+                if choose=='Distribution 1':
+                    mean=calculate_mean(df_x)
+                    print(f"\nArithmetic Mean: {mean:.2f}")
+                else:
+                    mean=calculate_mean(df_y)
+                    print(f"\nArithmetic Mean: {mean:.2f}")
             elif choice=='2':
-                median=calculate_median(df)
-                print(f"\nMedian: {median:.2f}")
+                if choose=='Distribution 1':
+                    median=calculate_median(df_x)
+                    print(f"\nMedian: {median:.2f}")
+                else:
+                    median=calculate_median(df_y)
+                    print(f"\nMedian: {median:.2f}")
             elif choice=='3':
-                for q in range(1,5):
-                    quartile=calculate_quartile(df,q)
-                    print(f"\nQ{q}: {quartile:.2f}")
+                if choose=='Distribution 1':
+                    for q in range(1,5):
+                        quartile=calculate_quartile(df_x,q)
+                        print(f"\nQ{q}: {quartile:.2f}")
+                else:
+                    for q in range(1,5):
+                        quartile=calculate_quartile(df_y,q)
+                        print(f"\nQ{q}: {quartile:.2f}")
             elif choice=='4':
-                for d in range(1,11):
-                    decile = calculate_decile(df,d)
-                    print(f"\nD{d}: {decile:.2f}")
+                if choose=='Distribution 1':
+                    for d in range(1,11):
+                        decile = calculate_decile(df_x,d)
+                        print(f"\nD{d}: {decile:.2f}")
+                else:
+                    for d in range(1,11):
+                        decile = calculate_decile(df_y,d)
+                        print(f"\nD{d}: {decile:.2f}")
             elif choice=='5':
-                for p in [10, 25, 50, 75, 90]:
-                    percentile = calculate_percentile(df, p)
-                    print(f"\nP{p}: {percentile:.2f}")
+                if choose=='Distribution 1':
+                    for p in [10, 25, 50, 75, 90]:
+                        percentile=calculate_percentile(df_x,p)
+                        print(f"\nP{p}: {percentile:.2f}")
+                else:
+                    for p in [10, 25, 50, 75, 90]:
+                        percentile=calculate_percentile(df_y,p)
+                        print(f"\nP{p}: {percentile:.2f}")
             elif choice=='6':
-                mode=calculate_mode(df)
-                print(f"\nMode: {mode:.2f}")
+                if choose=='Distribution 1':
+                    mode=calculate_mode(df_x)
+                    print(f"\nMode: {mode:.2f}")
+                else:
+                    mode=calculate_mode(df_y)
+                    print(f"\nMode: {mode:.2f}")
             elif choice=='7':
-                variance = calculate_variance(df)
-                print(f"\nVariance: {variance:.2f}")
+                print("Which group distribution's measure would you like to calculate")
+                choose=input("Distribution 1 or Distribution 2 : ")
+                if choose=='Distribution 1':
+                    variance = calculate_variance(df_x)
+                    print(f"\nVariance: {variance:.2f}")
+                else:
+                    variance = calculate_variance(df_y)
+                    print(f"\nVariance: {variance:.2f}")
             elif choice=='8':
-                std_dev = calculate_standard_deviation(df)
-                print(f"\nStandard Deviation: {std_dev:.2f}")
+                print("Which group distribution's measure would you like to calculate")
+                choose=input("Distribution 1 or Distribution 2 : ")
+                if choose=='Distribution 1':
+                    std_dev = calculate_standard_deviation(df_x)
+                    print(f"\nStandard Deviation: {std_dev:.2f}")
+                else:
+                    std_dev = calculate_standard_deviation(df_y)
+                    print(f"\nStandard Deviation: {std_dev:.2f}")
             elif choice=='9':
-                gm=calculate_geometric_mean(df)
-                print(f"\nGeometric Mean: {gm:.2f}")
+                print("Which group distribution's measure would you like to calculate")
+                choose=input("Distribution 1 or Distribution 2 : ")
+                if choose=='Distribution 1':
+                    gm=calculate_geometric_mean(df_x)
+                    print(f"\nGeometric Mean: {gm:.2f}")
+                else:
+                    gm=calculate_geometric_mean(df_y)
+                    print(f"\nGeometric Mean: {gm:.2f}")
             elif choice=='10':
-                hm=calculate_harmonic_mean(df)
-                print(f"\nHarmonic Mean: {hm:.2f}")
+                print("Which group distribution's measure would you like to calculate")
+                choose=input("Distribution 1 or Distribution 2 : ")
+                if choose=='Distribution 1':
+                    hm=calculate_harmonic_mean(df_x)
+                    print(f"\nHarmonic Mean: {hm:.2f}")
+                else:
+                    hm=calculate_harmonic_mean(df_y)
+                    print(f"\nHarmonic Mean: {hm:.2f}")
             elif choice=='11':
-                order = int(input("Enter the order of the moment about the mean: "))
-                Moment_mean=calculate_moment_about_mean(df,order)
-                print(f"\nRequired Moment about Mean: {Moment_mean:.2f}")
+                print("Which group distribution's measure would you like to calculate")
+                choose=input("Distribution 1 or Distribution 2 : ")
+                if choose=='Distribution 1':
+                    order=int(input("Enter the order of the moment about the mean: "))
+                    Moment_mean=calculate_moment_about_mean(df_x,order)
+                    print(f"\nRequired Moment about Mean: {Moment_mean:.2f}")
+                else:
+                    order=int(input("Enter the order of the moment about the mean: "))
+                    Moment_mean=calculate_moment_about_mean(df_y,order)
+                    print(f"\nRequired Moment about Mean: {Moment_mean:.2f}")
             elif choice=='12':
-                number=float(input("Enter the arbitrary number: "))
-                order=int(input("Enter the order of the moment: "))
-                Moment_arbitrary=calculate_moment_about_arbitrary(df,number,order)
-                print(f"\nRequired Moment about {number}: {Moment_arbitrary:.2f}")
+                print("Which group distribution's measure would you like to calculate")
+                choose=input("Distribution 1 or Distribution 2 : ")
+                if choose=='Distribution 1':
+                    number=float(input("Enter the arbitrary number: "))
+                    order=int(input("Enter the order of the moment: "))
+                    Moment_arbitrary=calculate_moment_about_arbitrary(df_x,number,order)
+                    print(f"\nRequired Moment about {number}: {Moment_arbitrary:.2f}")
+                else:
+                    number=float(input("Enter the arbitrary number: "))
+                    order=int(input("Enter the order of the moment: "))
+                    Moment_arbitrary=calculate_moment_about_arbitrary(df_y,number,order)
+                    print(f"\nRequired Moment about {number}: {Moment_arbitrary:.2f}")
             elif choice=='13':
-                order=int(input("Enter the order of the moment about the origin: "))
-                Moment_origin=calculate_moment_about_origin(df,order)
-                print(f"\nRequired Moment about Origin: {Moment_origin:.2f}")
+                print("Which group distribution's measure would you like to calculate")
+                choose=input("Distribution 1 or Distribution 2 : ")
+                if choose=='Distribution 1':
+                    order=int(input("Enter the order of the moment about the origin: "))
+                    Moment_origin=calculate_moment_about_origin(df_x,order)
+                    print(f"\nRequired Moment about Origin: {Moment_origin:.2f}")
+                else:
+                    order=int(input("Enter the order of the moment about the origin: "))
+                    Moment_origin=calculate_moment_about_origin(df_y,order)
+                    print(f"\nRequired Moment about Origin: {Moment_origin:.2f}")
             elif choice=='14':
-                K_C_skewness=Karl_coeff_skewness(df)
-                print(f"\nKarl Pearson's coeficient of skewness: {K_C_skewness:.2f}")
-                #To check for the symmetry of distribution
-                if K_C_skewness==0:
-                    print("The distribution is symmetrical")
-                elif K_C_skewness>0:
-                    print("The distribution is positively skewed")
+                print("Which group distribution's measure would you like to calculate")
+                choose=input("Distribution 1 or Distribution 2 : ")
+                if choose=='Distribution 1':
+                    K_C_skewness=Karl_coeff_skewness(df_x)
+                    print(f"\nKarl Pearson's coeficient of skewness: {K_C_skewness:.2f}")
+                    #To check for the symmetry of distribution
+                    if K_C_skewness==0:
+                        print("The distribution is symmetrical")
+                    elif K_C_skewness>0:
+                        print("The distribution is positively skewed")
+                    else:
+                        print("The distribution is negatively skewed")
                 else:
-                    print("The distribution is negatively skewed")
+                    K_C_skewness=Karl_coeff_skewness(df_y)
+                    print(f"\nKarl Pearson's coeficient of skewness: {K_C_skewness:.2f}")
+                    #To check for the symmetry of distribution
+                    if K_C_skewness==0:
+                        print("The distribution is symmetrical")
+                    elif K_C_skewness>0:
+                        print("The distribution is positively skewed")
+                    else:
+                        print("The distribution is negatively skewed")
             elif choice=='15':
-                skewness=Moment_coeff_skewness(df)
-                print(f"\nMoment Coefficient of Skewness: {skewness:.2f}")
+                print("Which group distribution's measure would you like to calculate")
+                choose=input("Distribution 1 or Distribution 2 : ")
+                if choose=='Distribution 1':
+                    skewness=Moment_coeff_skewness(df_x)
+                    print(f"\nMoment Coefficient of Skewness: {skewness:.2f}")
+                else:
+                    skewness=Moment_coeff_skewness(df_y)
+                    print(f"\nMoment Coefficient of Skewness: {skewness:.2f}")
             elif choice=='16':
-                kurtosis=calculate_kurtosis(df)
-                #Checking the shape of the curve of the distribution
-                print(f"\nMeasure of Kurtosis: {kurtosis:.2f}")
-                if kurtosis>3:
-                    print("The distribution is Leptokurtic")
-                elif kurtosis==3:
-                    print("The distribution is Mesokurtic")
+                print("Which group distribution's measure would you like to calculate")
+                choose=input("Distribution 1 or Distribution 2 : ")
+                if choose=='Distribution 1':
+                    kurtosis=calculate_kurtosis(df_x)
+                    #Checking the shape of the curve of the distribution
+                    print(f"\nMeasure of Kurtosis: {kurtosis:.2f}")
+                    if kurtosis>3:
+                        print("The distribution is Leptokurtic")
+                    elif kurtosis==3:
+                        print("The distribution is Mesokurtic")
+                    else:
+                        print("The distribution is Platykurtic")
                 else:
-                    print("The distribution is Platykurtic")
+                    kurtosis=calculate_kurtosis(df_y)
+                    #Checking the shape of the curve of the distribution
+                    print(f"\nMeasure of Kurtosis: {kurtosis:.2f}")
+                    if kurtosis>3:
+                        print("The distribution is Leptokurtic")
+                    elif kurtosis==3:
+                        print("The distribution is Mesokurtic")
+                    else:
+                        print("The distribution is Platykurtic")
             elif choice=='17':
-                mean=calculate_mean(df)
-                median=calculate_median(df)
-                for q in range(1,4):
-                    quartile=calculate_quartile(df,q)
-                for d in range(1,10):
-                    decile=calculate_decile(df,d)
-                for p in [10, 25, 50, 75, 90]:
-                    percentile=calculate_percentile(df,p)
-                mode=calculate_mode(df)
-                variance=calculate_variance(df)
-                std_dev=calculate_standard_deviation(df)
-                gm=calculate_geometric_mean(df)
-                hm=calculate_harmonic_mean(df)
-                order=int(input("Enter the order of the moment about the mean: "))
-                Moment_mean=calculate_moment_about_mean(df,order)
-                number=float(input("Enter the arbitrary number: "))
-                order=int(input("Enter the order of the moment: "))
-                Moment_arbitrary=calculate_moment_about_arbitrary(df,number,order)
-                order=int(input("Enter the order of the moment about the origin: "))
-                Moment_origin=calculate_moment_about_origin(df, order)
-                K_C_skewness=Karl_coeff_skewness(df)
-                skewness=Moment_coeff_skewness(df)
-                kurtosis=calculate_kurtosis(df)
-                print(f"\nArithmetic Mean: {mean:.2f}")
-                print(f"\nMedian: {median:.2f}")
-                print(f"\nQ{q}: {quartile:.2f}")
-                print(f"\nD{d}: {decile:.2f}")
-                print(f"\nP{p}: {percentile:.2f}")
-                print(f"\nMode: {mode:.2f}")
-                print(f"\nVariance: {variance:.2f}")
-                print(f"\nStandard Deviation: {std_dev:.2f}")
-                print(f"\nGeometric Mean: {gm:.2f}")
-                print(f"\nHarmonic Mean: {hm:.2f}")
-                print(f"\nRequired Moment about Mean: {Moment_mean:.2f}")
-                print(f"\nRequired Moment about {number}: {Moment_arbitrary:.2f}")
-                print(f"\nRequired Moment about Origin: {Moment_origin:.2f}")
-                print(f"\nKarl Pearson's coeeficient of skewness: {K_C_skewness:.2f}\n")
-                if K_C_skewness==0:
-                    print("The distribution is symmetrical")
-                elif K_C_skewness>0:
-                    print("The distribution is positively skewed")
+                print("Which group distribution's measure would you like to calculate")
+                choose=input("Distribution 1 or Distribution 2 : ")
+                if choose=='Distribution 1':
+                    gamma_1=calculate_gamma1(df_x)
+                    print(f"\nGamma 1: {gamma_1:.2f}")
                 else:
-                    print("The distribution is negatively skewed")
-                print(f"\nMoment Coefficient of Skewness: {skewness:.2f}")
-                print(f"\nMeasure of Kurtosis: {kurtosis:.2f}\n")
-                if kurtosis>3:
-                    print("The distribution is Leptokurtic")
-                elif kurtosis==3:
-                    print("The distribution is Mesokurtic")
+                    gamma_1=calculate_gamma1(df_y)
+                    print(f"\nGamma 1: {gamma_1:.2f}")
+            elif choice=='18':
+                print("Which group distribution's measure would you like to calculate")
+                choose=input("Distribution 1 or Distribution 2 : ")
+                if choose=='Distribution 1':
+                    gamma_2=calculate_gamma2(df_x)
+                    print(f"\nGamma 2: {gamma_2:.2f}")
                 else:
-                    print("The distribution is Platykurtic")
+                    gamma_2=calculate_gamma2(df_y)
+                    print(f"\nGamma 2: {gamma_2:.2f}")
+            elif choice=='19':
+                    coeff=calculate_correlation_coeff(df_x,df_y)
+                    print(f"\nThe coefficient of correlation is: {coeff:.2f}")
+            elif choice=='20':
+                    rank_coeff=calculate_rank_correlation_coeff(df_x,df_y)
+                    print(f"\nThe rank coefficient of correlation is: {rank_coeff:.2f}")
+            elif choice=='21':
+                if choose=='Distribution 1':
+                    mean=calculate_mean(df_x)
+                    median=calculate_median(df_x)
+                    mode=calculate_mode(df_x)
+                    variance=calculate_variance(df_x)
+                    std_dev=calculate_standard_deviation(df_x)
+                    gm=calculate_geometric_mean(df_x)
+                    hm=calculate_harmonic_mean(df_x)
+                    order=int(input("Enter the order of the moment about the mean: "))
+                    Moment_mean=calculate_moment_about_mean(df_x,order)
+                    number=float(input("Enter the arbitrary number: "))
+                    order=int(input("Enter the order of the moment: "))
+                    Moment_arbitrary=calculate_moment_about_arbitrary(df_x,number,order)
+                    order=int(input("Enter the order of the moment about the origin: "))
+                    Moment_origin=calculate_moment_about_origin(df_x, order)
+                    K_C_skewness=Karl_coeff_skewness(df_x)
+                    skewness=Moment_coeff_skewness(df_x)
+                    kurtosis=calculate_kurtosis(df_x)
+                    gamma_1=calculate_gamma1(df_x)
+                    gamma_2=calculate_gamma2(df_x)
+                    print(f"\nArithmetic Mean: {mean:.2f}")
+                    print(f"\nMedian: {median:.2f}")
+                    print(f"\nMode: {mode:.2f}")
+                    for q in range(1,5):
+                        quartile=calculate_quartile(df_x,q)
+                        print(f"\nQ{q}: {quartile:.2f}")
+                    for d in range(1,11):
+                        decile=calculate_decile(df_x,d)
+                        print(f"\nD{d}: {decile:.2f}")
+                    for p in [10, 25, 50, 75, 90]:
+                        percentile=calculate_percentile(df_x,p)
+                        print(f"\nP{p}: {percentile:.2f}")
+                    print(f"\nVariance: {variance:.2f}")
+                    print(f"\nStandard Deviation: {std_dev:.2f}")
+                    print(f"\nGeometric Mean: {gm:.2f}")
+                    print(f"\nHarmonic Mean: {hm:.2f}")
+                    print(f"\nRequired Moment about Mean: {Moment_mean:.2f}")
+                    print(f"\nRequired Moment about {number}: {Moment_arbitrary:.2f}")
+                    print(f"\nRequired Moment about Origin: {Moment_origin:.2f}")
+                    print(f"\nKarl Pearson's coefficient of skewness: {K_C_skewness:.2f}\n")
+                    if K_C_skewness==0:
+                        print("The distribution is symmetrical")
+                    elif K_C_skewness>0:
+                        print("The distribution is positively skewed")
+                    else:
+                        print("The distribution is negatively skewed")
+                    print(f"\nMoment Coefficient of Skewness: {skewness:.2f}")
+                    print(f"\nMeasure of Kurtosis: {kurtosis:.2f}\n")
+                    if kurtosis>3:
+                        print("The distribution is Leptokurtic")
+                    elif kurtosis==3:
+                        print("The distribution is Mesokurtic")
+                    else:
+                        print("The distribution is Platykurtic")
+                    print(f"\nGamma 1: {gamma_1:.2f}")
+                    print(f"\nGamma 2: {gamma_2:.2f}")
+                else:
+                    mean=calculate_mean(df_y)
+                    median=calculate_median(df_y)
+                    mode=calculate_mode(df_y)
+                    variance=calculate_variance(df_y)
+                    std_dev=calculate_standard_deviation(df_y)
+                    gm=calculate_geometric_mean(df_y)
+                    hm=calculate_harmonic_mean(df_y)
+                    order=int(input("Enter the order of the moment about the mean: "))
+                    Moment_mean=calculate_moment_about_mean(df_y,order)
+                    number=float(input("Enter the arbitrary number: "))
+                    order=int(input("Enter the order of the moment: "))
+                    Moment_arbitrary=calculate_moment_about_arbitrary(df_y,number,order)
+                    order=int(input("Enter the order of the moment about the origin: "))
+                    Moment_origin=calculate_moment_about_origin(df_y,order)
+                    K_C_skewness=Karl_coeff_skewness(df_y)
+                    skewness=Moment_coeff_skewness(df_y)
+                    kurtosis=calculate_kurtosis(df_y)
+                    gamma_1=calculate_gamma1(df_y)
+                    gamma_2=calculate_gamma2(df_y)
+                    print(f"\nArithmetic Mean: {mean:.2f}")
+                    print(f"\nMedian: {median:.2f}")                   
+                    print(f"\nMode: {mode:.2f}")
+                    for q in range(1,5):
+                        quartile=calculate_quartile(df_y,q)
+                        print(f"\nQ{q}: {quartile:.2f}")
+                    for d in range(1,11):
+                        decile=calculate_decile(df_y,d)
+                        print(f"\nD{d}: {decile:.2f}")
+                    for p in [10, 25, 50, 75, 90]:
+                        percentile=calculate_percentile(df_y,p)
+                        print(f"\nP{p}: {percentile:.2f}")
+                    print(f"\nVariance: {variance:.2f}")
+                    print(f"\nStandard Deviation: {std_dev:.2f}")
+                    print(f"\nGeometric Mean: {gm:.2f}")
+                    print(f"\nHarmonic Mean: {hm:.2f}")
+                    print(f"\nRequired Moment about Mean: {Moment_mean:.2f}")
+                    print(f"\nRequired Moment about {number}: {Moment_arbitrary:.2f}")
+                    print(f"\nRequired Moment about Origin: {Moment_origin:.2f}")
+                    print(f"\nKarl Pearson's coeeficient of skewness: {K_C_skewness:.2f}\n")
+                    if K_C_skewness==0:
+                        print("The distribution is symmetrical")
+                    elif K_C_skewness>0:
+                        print("The distribution is positively skewed")
+                    else:
+                        print("The distribution is negatively skewed")
+                    print(f"\nMoment Coefficient of Skewness: {skewness:.2f}")
+                    print(f"\nMeasure of Kurtosis: {kurtosis:.2f}\n")
+                    if kurtosis>3:
+                        print("The distribution is Leptokurtic")
+                    elif kurtosis==3:
+                        print("The distribution is Mesokurtic")
+                    else:
+                        print("The distribution is Platykurtic")
+                    print(f"\nGamma 1: {gamma_1:.2f}")
+                    print(f"\nGamma 2: {gamma_2:.2f}")
+                coeff=calculate_correlation_coeff(df_x,df_y)
+                rank_coeff=calculate_rank_correlation_coeff(df_x,df_y)
+                print(f"\nThe coefficient of correlation is: {coeff:.2f}")
+                print(f"\nThe rank coefficient of correlation is: {rank_coeff:.2f}")
+                break
             else:
                 print("\nInvalid choice. Please try again.")
                 break
+        plot_graph(df_x,df_y)
         repeat=input("\nDo you want to re-enter the data? (yes/no): ").strip().lower()
         if repeat!='yes':
             print("Thank you! Exiting the program.")
